@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐍 Desafio Debug Python</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:#1e293b;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+h1{
+    text-align:center;
+    color:#38bdf8;
+}
+
+.status{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+    font-size:18px;
+}
+
+.barra{
+    width:100%;
+    background:#334155;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.progresso{
+    width:0%;
+    height:20px;
+    background:#22c55e;
+    transition:.5s;
+}
+
+.card{
+    background:#334155;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+pre{
+    background:black;
+    color:#00ff7f;
+    padding:15px;
+    border-radius:10px;
+    overflow:auto;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    background:#38bdf8;
+    color:white;
+}
+
+button:hover{
+    background:#0ea5e9;
+}
+
+#mensagem{
+    margin-top:20px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.oculto{
+    display:none;
+}
+
+.ranking-item{
+    padding:8px;
+    background:#334155;
+    border-radius:8px;
+    margin-top:8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🐍 DESAFIO DEBUG PYTHON 🐍</h1>
+
+<div class="status">
+<div>⭐ Pontos: <span id="pontos">0</span></div>
+<div>❤️ Vidas: <span id="vidas">3</span></div>
+<div>⏱️ Tempo: <span id="tempo">0</span>s</div>
+</div>
+
+<div class="barra">
+<div id="progresso" class="progresso"></div>
+</div>
+
+<div id="jogo">
+
+<h2 id="faseTitulo"></h2>
+
+<div class="card">
+<pre id="codigo"></pre>
+</div>
+
+<div id="alternativas"></div>
+
+<div id="mensagem"></div>
+
+</div>
+
+<div id="fim" class="oculto"></div>
+
+</div>
+
+<script>
+
+let vidas = 3;
+let pontos = 0;
+let faseAtual = 0;
+let tempo = 0;
+
+const elogios = [
+"🎉 Excelente!",
+"🚀 Você está voando!",
+"🏆 Muito bem!",
+"👏 Ótimo trabalho!",
+"⭐ Incrível!",
+"🔥 Continue assim!",
+"🐍 Mestre do Python!",
+"🎯 Acertou em cheio!",
+"💡 Excelente raciocínio!",
+"😎 Você mandou bem!"
+];
+
+setInterval(()=>{
+    tempo++;
+    document.getElementById("tempo").innerText = tempo;
+},1000);
+
+const fases = [
+
+{
+titulo:"Pergunta 1",
+codigo:`print("Olá Mundo!)`,
+opcoes:["Falta fechar as aspas","Falta um número","Falta input","Falta variável"],
+correta:0
+},
+{
+titulo:"Pergunta 2",
+codigo:`nome = input(Digite seu nome:)`,
+opcoes:["Falta print","Texto precisa estar entre aspas","Input não existe","Falta variável"],
+correta:1
+},
+{
+titulo:"Pergunta 3",
+codigo:`altura = float("1,75")`,
+opcoes:["Float usa ponto","Float deve ser int","Float não existe","Falta print"],
+correta:0
+},
+{
+titulo:"Pergunta 4",
+codigo:`aprovado = true`,
+opcoes:["Falta print","True deve ser maiúsculo","Boolean não existe","Falta input"],
+correta:1
+},
+{
+titulo:"Pergunta 5",
+codigo:`if idade >= 18
+    print("Maior")`,
+opcoes:["Falta input","If não existe","Faltam dois pontos","Falta aspas"],
+correta:2
+},
+{
+titulo:"Pergunta 6",
+codigo:`else idade < 18:
+    print("Menor")`,
+opcoes:["Else não recebe condição","Falta print","Idade errada","Else não existe"],
+correta:0
+},
+{
+titulo:"Pergunta 7",
+codigo:`print(Olá)`,
+opcoes:["Olá precisa estar entre aspas","Print errado","Falta variável","Falta float"],
+correta:0
+},
+{
+titulo:"Pergunta 8",
+codigo:`idade = int("dez")`,
+opcoes:["Não converte texto para int","Int não existe","Falta aspas","Falta print"],
+correta:0
+},
+{
+titulo:"Pergunta 9",
+codigo:`if nota => 7:`,
+opcoes:["Operador errado","Falta print","If não existe","Nota deve ser float"],
+correta:0
+},
+{
+titulo:"Pergunta 10",
+codigo:`nome == "João"`,
+opcoes:["Deveria usar =","Input","Float","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 11",
+codigo:`idade = input(18)`,
+opcoes:["Input deveria receber texto","Input não existe","Falta if","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 12",
+codigo:`print("Olá"`,
+opcoes:["Falta )","Falta if","Falta else","Falta variável"],
+correta:0
+},
+{
+titulo:"Pergunta 13",
+codigo:`nota = 8
+if nota >= 7
+print("Aprovado")`,
+opcoes:["Falta :","Nota errada","Print errado","If errado"],
+correta:0
+},
+{
+titulo:"Pergunta 14",
+codigo:`valor = floot(10.5)`,
+opcoes:["Float escrito errado","Valor errado","Falta print","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 15",
+codigo:`ativo = FALSE`,
+opcoes:["False escrito errado","False não existe","Falta if","Falta input"],
+correta:0
+},
+{
+titulo:"Pergunta 16",
+codigo:`for i in range("5"):`,
+opcoes:["Range espera número","Falta print","For errado","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 17",
+codigo:`print(10 + "5")`,
+opcoes:["Não soma número com texto","Falta aspas","Falta variável","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 18",
+codigo:`if True
+print("OK")`,
+opcoes:["Falta :","Falta float","Print errado","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 19",
+codigo:`nome = "Ana
+print(nome)`,
+opcoes:["Falta fechar aspas","Falta print","Nome errado","Correto"],
+correta:0
+},
+{
+titulo:"Pergunta 20",
+codigo:`if idade > 18:
+print("Maior")`,
+opcoes:["Falta indentação","Falta variável","Idade errada","Correto"],
+correta:0
+}
+
+];
+
+function atualizarTela(){
+
+document.getElementById("vidas").innerText = vidas;
+document.getElementById("pontos").innerText = pontos;
+
+let porcentagem =
+((faseAtual)/fases.length)*100;
+
+document.getElementById("progresso")
+.style.width = porcentagem + "%";
+
+}
+
+function carregarFase(){
+
+if(faseAtual>=fases.length){
+finalizarJogo();
+return;
+}
+
+let fase = fases[faseAtual];
+
+document.getElementById("faseTitulo").innerText =
+`${fase.titulo} (${faseAtual+1}/20)`;
+
+document.getElementById("codigo").innerText =
+fase.codigo;
+
+let div = document.getElementById("alternativas");
+div.innerHTML = "";
+
+fase.opcoes.forEach((opcao,index)=>{
+
+let btn = document.createElement("button");
+
+btn.innerText = opcao;
+
+btn.onclick = ()=> verificar(index);
+
+div.appendChild(btn);
+
+});
+
+document.getElementById("mensagem").innerHTML = "";
+
+atualizarTela();
+
+}
+
+function verificar(resp){
+
+let fase = fases[faseAtual];
+
+if(resp===fase.correta){
+
+pontos += 10;
+
+let elogio =
+elogios[Math.floor(Math.random()*elogios.length)];
+
+document.getElementById("mensagem").innerHTML =
+`${elogio}<br>✅ +10 pontos`;
+
+setTimeout(()=>{
+faseAtual++;
+carregarFase();
+},1200);
+
+}else{
+
+vidas--;
+
+document.getElementById("mensagem").innerHTML =
+"❌ Tente novamente!";
+
+atualizarTela();
+
+if(vidas<=0){
+
+alert("💀 GAME OVER!");
+
+location.reload();
+
+}
+
+}
+
+}
+
+function salvarRanking(){
+
+let nome = prompt(
+"Digite seu nome para o ranking:"
+);
+
+if(!nome) nome = "Jogador";
+
+let ranking =
+JSON.parse(localStorage.getItem("ranking")) || [];
+
+ranking.push({
+nome:nome,
+pontos:pontos,
+tempo:tempo
+});
+
+ranking.sort((a,b)=>{
+
+if(b.pontos!==a.pontos){
+return b.pontos-a.pontos;
+}
+
+return a.tempo-b.tempo;
+
+});
+
+ranking = ranking.slice(0,10);
+
+localStorage.setItem(
+"ranking",
+JSON.stringify(ranking)
+);
+
+}
+
+function mostrarRanking(){
+
+let ranking =
+JSON.parse(localStorage.getItem("ranking")) || [];
+
+let html =
+"<h2>🏆 Ranking dos Debuggers</h2>";
+
+ranking.forEach((j,index)=>{
+
+let medalha="🏅";
+
+if(index===0) medalha="🥇";
+if(index===1) medalha="🥈";
+if(index===2) medalha="🥉";
+
+html += `
+<div class='ranking-item'>
+${medalha}
+${j.nome}
+-
+⭐ ${j.pontos}
+-
+⏱️ ${j.tempo}s
+</div>
+`;
+
+});
+
+return html;
+
+}
+
+function finalizarJogo(){
+
+document.getElementById("jogo")
+.classList.add("oculto");
+
+salvarRanking();
+
+let html = `
+<h2>🎉 PARABÉNS! 🎉</h2>
+
+<p>
+Você concluiu o Desafio Debug Python!
+</p>
+
+<p>
+⭐ Pontuação: <strong>${pontos}</strong>
+</p>
+
+<p>
+⏱️ Tempo: <strong>${tempo}</strong> segundos
+</p>
+
+<p>
+🐍 Agora você é um caçador oficial de bugs!
+</p>
+
+<hr>
+
+${mostrarRanking()}
+
+<br>
+
+<button onclick="location.reload()">
+🔄 Jogar Novamente
+</button>
+`;
+
+document.getElementById("fim")
+.classList.remove("oculto");
+
+document.getElementById("fim")
+.innerHTML = html;
+
+}
+
+carregarFase();
+
+</script>
+
+</body>
+</html>
